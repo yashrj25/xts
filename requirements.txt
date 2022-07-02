@@ -1,2 +1,12 @@
 -e git+ssh://git@github.com/yashrj25/one.git@b85f0c9da8b205c671940193611960cd03c96bec#egg=one
 -e git+ssh://git@github.com/yashrj25/xts.git@4bb11f4ce1ff3e4571d41541e6f3fc7cf526b369#egg=xts
+bidict==0.21.2
+certifi==2020.12.5
+chardet==4.0.0
+idna==2.10
+python-engineio==3.13.0
+python-socketio==4.6.0
+requests==2.25.1
+six==1.15.0
+urllib3==1.26.4
+websocket-client==0.57.0
