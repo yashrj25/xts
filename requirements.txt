@@ -1,0 +1,2 @@
+-e git+ssh://git@github.com/yashrj25/one.git@b85f0c9da8b205c671940193611960cd03c96bec#egg=one
+-e git+ssh://git@github.com/yashrj25/xts.git@4bb11f4ce1ff3e4571d41541e6f3fc7cf526b369#egg=xts
