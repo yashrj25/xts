@@ -6,8 +6,8 @@ path = '/Users/entirety/xts/client/config.ini'
 cfg = configparser.ConfigParser()
 cfg.read(path)
 
-# uid = 'SHAREINDIA_DEL14'
-uid = 'IIFL_54900024'
+uid = 'SHAREINDIA_DEL14'
+# uid = 'IIFL_54900024'
 
 xtsi = XTSConnect(
     apiKey=cfg[uid]['interactive_order_api_key'],
@@ -21,7 +21,7 @@ xtsi = XTSConnect(
 
 xtsi.token = None
 response = xtsi.interactive_login()
-print(response['result']['token'])
+print('INTERACTIVE: ',response['result']['token'])
 
 xtsm = XTSConnect(
     apiKey=cfg[uid]['market_data_api_key'],
@@ -35,7 +35,7 @@ xtsm = XTSConnect(
 
 xtsm.token = None
 response = xtsm.marketdata_login()
-print(response['result']['token'])
+print('MARKET: ',response['result']['token'])
 
 # xt.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiI1NDkwMDAyNF84M0Q5N0JDRTUzMzc2ODA4ODREMjQxIiwicHVibGljS2V5IjoiODNkOTdiY2U1MzM3NjgwODg0ZDI0MSIsImlhdCI6MTY1NjcyNzY2MSwiZXhwIjoxNjU2ODE0MDYxfQ.c242UgoWIzBio7FvSQXI26K95L5JYSZDdWuFaz3P0pA'
 
