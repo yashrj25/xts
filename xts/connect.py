@@ -248,7 +248,8 @@ class XTSConnect(XTSCommon):
             response = self._post("order.place", json.dumps(params))
             return response
         except Exception as e:
-            return response["description"]
+            print(e)
+            #return response["description"]
 
     def get_profile(self, clientID=None):
         """
