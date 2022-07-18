@@ -7,7 +7,7 @@ charset-normalizer==2.1.0
 click==8.1.3
 idna==2.10
 mypy-extensions==0.4.3
--e git+ssh://git@github.com/yashrj25/one.git@51ca082e3c575f26adbfd51a365418ae77adcb1c#egg=one
+-e git+ssh://git@github.com/yashrj25/one.git@b9d3363be2f4a2df4be8758600629ac128da72b5#egg=one
 pathspec==0.9.0
 platformdirs==2.5.2
 pycodestyle==2.8.0
@@ -19,4 +19,4 @@ toml==0.10.2
 tomli==2.0.1
 urllib3==1.26.4
 websocket-client==0.57.0
--e git+ssh://git@github.com/yashrj25/xts.git@47ca9282f8763ec4d389a2200aa0f739f16ed8b5#egg=xts
+-e git+ssh://git@github.com/yashrj25/xts.git@30006d52f918459aca537af12388d1cc5184a586#egg=xts
