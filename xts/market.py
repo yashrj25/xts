@@ -1,9 +1,5 @@
-import os
 import socketio
-import configparser
 from datetime import datetime
-from one.utils import path
-
 
 class MDSocket_io(socketio.Client):
     """A Socket.IO client.
@@ -39,50 +35,69 @@ class MDSocket_io(socketio.Client):
                  versions.
     """
 
-    def __init__(self, token, userID, uid, reconnection=True, reconnection_attempts=0, reconnection_delay=1,
+    def __init__(self, user_details, reconnection=True, reconnection_attempts=0, reconnection_delay=1,
                  reconnection_delay_max=50000, randomization_factor=0.5, logger=False, binary=False, json=None,
                  **kwargs):
         self.sid = socketio.Client(logger=True, engineio_logger=True)
         self.eventlistener = self.sid
 
-        self.sid.on('connect', self.on_connect)
-        self.sid.on('message', self.on_message)
+        self.sid.on('connect', self._on_connect)
+        self.sid.on('message', self._on_message)
 
         """Similarly implement partial json full and binary json full."""
-        self.sid.on('1502-json-full', self.on_message1502_json_full)
-        self.sid.on('1502-json-partial', self.on_message1502_json_partial)
+        self.sid.on('1502-json-full', self._on_message1502_json_full)
+        self.sid.on('1502-json-partial', self._on_message1502_json_partial)
 
-        self.sid.on('1504-json-full', self.on_message1504_json_full)
-        self.sid.on('1504-json-partial', self.on_message1504_json_partial)
+        self.sid.on('1504-json-full', self._on_message1504_json_full)
+        self.sid.on('1504-json-partial', self._on_message1504_json_partial)
 
-        self.sid.on('1505-json-full', self.on_message1505_json_full)
-        self.sid.on('1505-json-partial', self.on_message1505_json_partial)
+        self.sid.on('1505-json-full', self._on_message1505_json_full)
+        self.sid.on('1505-json-partial', self._on_message1505_json_partial)
 
-        self.sid.on('1510-json-full', self.on_message1510_json_full)
-        self.sid.on('1510-json-partial', self.on_message1510_json_partial)
+        self.sid.on('1510-json-full', self._on_message1510_json_full)
+        self.sid.on('1510-json-partial', self._on_message1510_json_partial)
 
-        self.sid.on('1501-json-full', self.on_message1501_json_full)
-        self.sid.on('1501-json-partial', self.on_message1501_json_partial)
+        self.sid.on('1501-json-full', self._on_message1501_json_full)
+        self.sid.on('1501-json-partial', self._on_message1501_json_partial)
 
-        self.sid.on('1105-json-partial', self.on_message1105_json_partial)
+        self.sid.on('1105-json-partial', self._on_message1105_json_partial)
 
-        self.sid.on('disconnect', self.on_disconnect)
+        self.sid.on('disconnect', self._on_disconnect)
 
         """Get the root url from config file"""
-        currDirMain = os.getcwd()
-        configParser = configparser.ConfigParser()
-        configFilePath = path.xts_config #os.path.join(currDirMain, '..\XTConnect_2\config.ini')
-        configParser.read(configFilePath)
+        # currDirMain = os.getcwd()
+        # configParser = configparser.ConfigParser()
+        # configFilePath = path.xts_config #os.path.join(currDirMain, '..\XTConnect_2\config.ini')
+        # configParser.read(configFilePath)
 
-        self.port = configParser.get(uid, 'root_url')
-        self.userID = userID
+        # self.port = configParser.get(uid, 'root_url')
+        self.port = user_details['root_url']
+        self.userID = user_details['user_id']
         publishFormat = 'JSON'
-        self.broadcastMode = configParser.get(uid, 'broadcastMode')
-        self.token = token
+        # self.broadcastMode = configParser.get(uid, 'broadcastMode')
+        self.broadcastMode = user_details['broadcastMode']
+        # self.token = token
+        self.token = user_details['market_data_access_token']
 
         port = f'{self.port}/?token='
 
-        self.connection_url = port + token + '&userID=' + self.userID + '&publishFormat=' + publishFormat + '&broadcastMode=' + self.broadcastMode
+        self.connection_url = port + self.token + '&userID=' + self.userID + '&publishFormat=' + publishFormat + '&broadcastMode=' + self.broadcastMode
+
+        self.on_connect = None
+        self.on_message = None
+        self.on_message1502_json_full = None
+        self.on_message1504_json_full = None
+        self.on_message1505_json_full = None
+        self.on_message1510_json_full = None
+        self.on_message1501_json_full = None
+        self.on_message1502_json_partial = None
+        self.on_message1504_json_partial = None
+        self.on_message1505_json_partial = None
+        self.on_message1510_json_partial = None
+        self.on_message1501_json_partial = None
+        self.on_message1105_json_partial = None
+        self.on_disconnect = None
+        self.on_error = None
 
     def connect(self, headers={}, transports='websocket', namespaces=None, socketio_path='/apimarketdata/socket.io',
                 verify=False):
@@ -114,77 +129,94 @@ class MDSocket_io(socketio.Client):
         """
         url = self.connection_url
         """Connected to the socket."""
-        self.sid.connect(url, headers, transports, namespaces, socketio_path)
-        self.sid.wait()
+        print('Connecting...')
+        self.sid.connect(url, headers=headers, transports=transports, namespaces=namespaces, socketio_path=socketio_path)
+        # print('Waiting...')
+        # self.sid.wait()
         """Disconnected from the socket."""
         # self.sid.disconnect()
 
-    def on_connect(self):
+    def _on_connect(self):
         """Connect from the socket."""
-        print('Market Data Socket connected successfully!')
+        self.on_connect()
+        # print('Market Data Socket connected successfully!')
 
-    def on_message(self, data):
+    def _on_message(self, data):
         """On receiving message"""
-        print('I received a message!' + data)
+        self.on_message(data)
+        # print('I received a message!' + data)
 
-    def on_message1502_json_full(self, data):
+    def _on_message1502_json_full(self, data):
         """On receiving message code 1502 full"""
-        print('I received a 1502 Market depth message!' + data)
+        self.on_message1502_json_full(data)
+        # print('I received a 1502 Market depth message!' + data)
 
-    def on_message1504_json_full(self, data):
+    def _on_message1504_json_full(self, data):
         """On receiving message code 1504 full"""
         """On receiving message code 1504 full"""
-        print('I received a 1504 Index data message!' + data)
+        self.on_message1504_json_full(data)
+        # print('I received a 1504 Index data message!' + data)
 
-    def on_message1505_json_full(self, data):
+    def _on_message1505_json_full(self, data):
         """On receiving message code 1505 full"""
-        print('I received a 1505 Candle data message!' + data)
+        self.on_message1505_json_full(data)
+        # print('I received a 1505 Candle data message!' + data)
 
-    def on_message1510_json_full(self, data):
+    def _on_message1510_json_full(self, data):
         """On receiving message code 1510 full"""
-        print('I received a 1510 Open interest message!' + data)
+        self.on_message1510_json_full(data)
+        # print('I received a 1510 Open interest message!' + data)
 
-    def on_message1501_json_full(self, data):
+    def _on_message1501_json_full(self, data):
         """On receiving message code 1501 full"""
-        print('I received a 1501 Level1,Touchline message!' + data)
+        self.on_message1501_json_full(data)
+        # print('I received a 1501 Level1,Touchline message!' + data)
 
-    def on_message1502_json_partial(self, data):
+    def _on_message1502_json_partial(self, data):
         """On receiving message code 1502 partial"""
-        print('I received a 1502 partial message!' + data)
+        self.on_message1502_json_partial(data)
+        # print('I received a 1502 partial message!' + data)
 
-    def on_message1504_json_partial(self, data):
+    def _on_message1504_json_partial(self, data):
         """On receiving message code 1504 partial"""
-        print('I received a 1504 Index data message!' + data)
+        self.on_message1504_json_partial(data)
+        # print('I received a 1504 Index data message!' + data)
 
-    def on_message1505_json_partial(self, data):
+    def _on_message1505_json_partial(self, data):
         """On receiving message code 1505 partial"""
-        print('I received a 1505 Candle data message!' + data)
+        self.on_message1505_json_partial(data)
+        # print('I received a 1505 Candle data message!' + data)
 
-    def on_message1510_json_partial(self, data):
+    def _on_message1510_json_partial(self, data):
         """On receiving message code 1510 partial"""
-        print('I received a 1510 Open interest message!' + data)
+        self.on_message1510_json_partial(data)
+        # print('I received a 1510 Open interest message!' + data)
 
-    def on_message1501_json_partial(self, data):
+    def _on_message1501_json_partial(self, data):
         """On receiving message code 1501 partial"""
-        now = datetime.now()
-        today = now.strftime("%H:%M:%S")
-        print(today, 'in main 1501 partial Level1,Touchline message!' + data + ' \n')
+        self.on_message1501_json_partial(data)
+        # now = datetime.now()
+        # today = now.strftime("%H:%M:%S")
+        # print(today, 'in main 1501 partial Level1,Touchline message!' + data + ' \n')
 
-    def on_message1105_json_partial(self, data):
+    def _on_message1105_json_partial(self, data):
         """On receiving message code 1105 partial"""
-        now = datetime.now()
-        today = now.strftime("%H:%M:%S")
-        print(today, 'in main 1105 partial, Instrument Property Change Event!' + data + ' \n')
+        self.on_message1105_json_partial(data)
+        # now = datetime.now()
+        # today = now.strftime("%H:%M:%S")
+        # print(today, 'in main 1105 partial, Instrument Property Change Event!' + data + ' \n')
 
-        print('I received a 1105 Instrument Property Change Event!' + data)
+        # print('I received a 1105 Instrument Property Change Event!' + data)
 
-    def on_disconnect(self):
+    def _on_disconnect(self):
         """Disconnected from the socket"""
-        print('Market Data Socket disconnected!')
+        self.on_disconnect()
+        # print('Market Data Socket disconnected!')
 
-    def on_error(self, data):
+    def _on_error(self, data):
         """Error from the socket"""
-        print('Market Data Error', data)
+        self.on_error(data)
+        # print('Market Data Error', data)
 
     def get_emitter(self):
         """For getting the event listener"""

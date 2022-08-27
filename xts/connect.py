@@ -186,8 +186,9 @@ class XTSConnect(XTSCommon):
                 "secretKey": self.secretKey,
                 "source": self.source,
             }
+            print(params)
             response = self._post("user.login", params)
-
+            print(response)
             if "token" in response["result"]:
                 self._set_common_variables(
                     response["result"]["token"], response["result"]["isInvestorClient"]
@@ -771,9 +772,11 @@ class XTSConnect(XTSCommon):
         """Make an HTTP request."""
         params = parameters if parameters else {}
 
+        print('params: ', params)
         # Form a restful URL
         uri = self._routes[route].format(params)
         url = urljoin(self.root, uri)
+        print('url: ', url)
         headers = {}
 
         if self.token:
@@ -782,6 +785,8 @@ class XTSConnect(XTSCommon):
                 {"Content-Type": "application/json", "Authorization": self.token}
             )
 
+        print('headers: ', headers)
+        print('ssl: ', self.disable_ssl)
         try:
             r = self.reqsession.request(
                 method,
@@ -793,6 +798,7 @@ class XTSConnect(XTSCommon):
             )
 
         except Exception as e:
+            print('Error in request')
             raise e
 
         if self.debug:
@@ -813,6 +819,7 @@ class XTSConnect(XTSCommon):
                     )
                 )
 
+            print('data: ', data)
             # api error
             if data.get("type"):
 
